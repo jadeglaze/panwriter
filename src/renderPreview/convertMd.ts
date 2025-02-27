@@ -1,10 +1,26 @@
 import markdownIt, { Options } from 'markdown-it'
 import Renderer from 'markdown-it/lib/renderer'
 import markdownItPandoc from 'markdown-it-pandoc'
-import { Doc } from '../appState/AppState'
+import texmath from 'markdown-it-texmath'
+import katex from 'katex'
+import { Doc, Settings } from '../appState/AppState'
 
-const mdItPandoc = markdownItPandoc(markdownIt())
-const defaultImageRender = mdItPandoc.renderer.rules.image
+// Initialize markdown-it instance
+const md = markdownIt()
+let mdItPandoc = markdownItPandoc(md)
+let defaultImageRender = mdItPandoc.renderer.rules.image as Renderer.RenderRule
+
+/**
+ * Configure markdown-it with the provided settings
+ */
+export const configureMarkdownIt = (settings: Settings) => {
+  md.use(texmath, { 
+    engine: katex,
+    delimiters: settings.latexDelimiters
+  })
+  mdItPandoc = markdownItPandoc(md)
+  defaultImageRender = mdItPandoc.renderer.rules.image as Renderer.RenderRule
+}
 
 /**
  * converts the markdown in `doc` to HTML
